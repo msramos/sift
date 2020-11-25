@@ -62,6 +62,32 @@ defmodule Sift.Events do
     time: %Field{key: "$time", type: :integer}
   }
 
+  @create_account_fields %{
+    user_id: %Field{key: "$user_id", required?: true},
+    user_email: %Field{key: "$user_email"},
+    name: %Field{key: "$name"},
+    phone: %Field{key: "$phone"},
+    referrer_user_id: %Field{key: "$referrer_user_id"},
+    payment_methods: %Field{key: "$payment_methods", type: {:list, :payment_method}},
+    billing_address: %Field{key: "$billing_address", type: :address},
+    shipping_address: %Field{key: "$shipping_address", type: :address},
+    promotions: %Field{key: "$promotions", type: {:list, :promotion}},
+    social_sign_on_type: %Field{
+      key: "$social_sign_on_type",
+      type:
+        {:enum,
+         [:facebook, :google, :linkedin, :twitter, :yahoo, :microsoft, :amazon, :apple, :other]}
+    },
+    browser: %Field{key: "$browser", type: :browser, union: :source},
+    app: %Field{key: "$app", type: :app, union: :source},
+    account_types: %Field{key: "$account_types", type: {:list, :string}},
+    brand_name: %Field{key: "$brand_name"},
+    site_country: %Field{key: "$site_country", type: :country_code},
+    site_domain: %Field{key: "$site_domain"},
+    ip: %Field{key: "$ip"},
+    time: %Field{key: "$time", type: :integer}
+  }
+
   @comment_object %{
     body: %Field{key: "$body"},
     contact_email: %Field{key: "$contact_email"},
@@ -143,6 +169,34 @@ defmodule Sift.Events do
     time: %Field{key: "$time", type: :integer}
   }
 
+  @create_order_fields %{
+    user_id: %Field{key: "$user_id", union: {:id, 0}, union_required?: true},
+    session_id: %Field{key: "$session_id", union: {:id, 1}},
+    order_id: %Field{key: "$order_id"},
+    user_email: %Field{key: "$user_email"},
+    amount: %Field{key: "$amount", type: :integer},
+    currency_code: %Field{key: "$currency_code", type: :currency_code},
+    billing_address: %Field{key: "$billing_address", type: :address},
+    payment_methods: %Field{key: "$payment_methods", type: {:list, :payment_method}},
+    shipping_address: %Field{key: "$shipping_address", type: :address},
+    expedited_shipping: %Field{key: "$expedited_shipping", type: :boolean},
+    items: %Field{key: "$items", type: {:list, :item}, union: :items_or_bookings},
+    bookings: %Field{key: "$bookings", type: {:list, :booking}, union: :items_or_bookings},
+    seller_user_id: %Field{key: "$seller_user_id"},
+    promotions: %Field{key: "$promotions", type: {:list, :promotion}},
+    shipping_method: %Field{key: "$shipping_method", type: {:enum, [:electronic, :physical]}},
+    shipping_carrier: %Field{key: "$shipping_carrier"},
+    shipping_tracking_number: %Field{key: "$shipping_tracking_number"},
+    ordered_from: %Field{key: "$ordered_from", type: :ordered_from},
+    browser: %Field{key: "$browser", type: :browser, union: :source},
+    app: %Field{key: "$app", type: :app, union: :source},
+    brand_name: %Field{key: "$brand_name"},
+    site_country: %Field{key: "$site_country", type: :country_code},
+    site_domain: %Field{key: "$site_domain"},
+    ip: %Field{key: "$ip"},
+    time: %Field{key: "$time", type: :integer}
+  }
+
   @flag_content_fields %{
     user_id: %Field{key: "$user_id", union: {:id, 0}, union_required?: true},
     session_id: %Field{key: "$session_id", union: {:id, 1}},
@@ -158,16 +212,9 @@ defmodule Sift.Events do
     time: %Field{key: "$time", type: :integer}
   }
 
-  @logout_fields %{
-    user_id: %Field{key: "$user_id", union: {:id, 0}, union_required?: true},
-    session_id: %Field{key: "$session_id", union: {:id, 1}},
-    browser: %Field{key: "$browser", type: :browser, union: :source},
-    app: %Field{key: "$app", type: :app, union: :source},
-    brand_name: %Field{key: "$brand_name"},
-    site_country: %Field{key: "$site_country"},
-    site_domain: %Field{key: "$site_domain"},
-    ip: %Field{key: "$ip"},
-    time: %Field{key: "$time", type: :integer}
+  @link_session_to_user_fields %{
+    user_id: %Field{key: "$user_id", required?: true},
+    session_id: %Field{key: "$session_id", required?: true}
   }
 
   @login_fields %{
@@ -194,6 +241,18 @@ defmodule Sift.Events do
     time: %Field{key: "$time", type: :integer}
   }
 
+  @logout_fields %{
+    user_id: %Field{key: "$user_id", union: {:id, 0}, union_required?: true},
+    session_id: %Field{key: "$session_id", union: {:id, 1}},
+    browser: %Field{key: "$browser", type: :browser, union: :source},
+    app: %Field{key: "$app", type: :app, union: :source},
+    brand_name: %Field{key: "$brand_name"},
+    site_country: %Field{key: "$site_country"},
+    site_domain: %Field{key: "$site_domain"},
+    ip: %Field{key: "$ip"},
+    time: %Field{key: "$time", type: :integer}
+  }
+
   def add_item_to_cart(params) do
     Base.execute("$add_item_to_cart", params, @add_item_to_cart_fields)
   end
@@ -210,12 +269,24 @@ defmodule Sift.Events do
     Base.execute("$content_status", params, @content_status_fields)
   end
 
+  def create_account(params) do
+    Base.execute("$create_account", params, @create_account_fields)
+  end
+
   def create_content(params) do
     Base.execute("$create_content", params, @create_content_fields)
   end
 
+  def create_order(params) do
+    Base.execute("$create_order", params, @create_order_fields)
+  end
+
   def flag_content(params) do
     Base.execute("$flag_content", params, @flag_content_fields)
+  end
+
+  def link_session_to_user(params) do
+    Base.execute("$link_session_to_user", params, @link_session_to_user_fields)
   end
 
   def login(params) do
