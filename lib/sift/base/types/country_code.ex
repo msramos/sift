@@ -8,8 +8,6 @@ defmodule Sift.Base.Types.CountryCode do
   @country_codes Path.join([__DIR__, "country_code.csv"])
                  |> File.read!()
                  |> String.split("\n")
-                 |> Enum.map(&String.split(&1, ","))
-                 |> Enum.map(fn [code | _rest] -> code end)
 
   @impl Type
   def type_alias, do: :country_code
