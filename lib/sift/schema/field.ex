@@ -1,4 +1,4 @@
-defmodule Sift.Base.Field do
+defmodule Sift.Schema.Field do
   @moduledoc """
   Field specification
   """
@@ -7,7 +7,7 @@ defmodule Sift.Base.Field do
 
   @type t :: %__MODULE__{
           key: String.t(),
-          type: :string | :browser | :app | :address | {:enum, [:atom]},
+          type: atom() | {atom(), any()},
           required?: boolean(),
           union: atom() | {atom(), non_neg_integer()},
           union_required?: boolean()

@@ -1,6 +1,44 @@
 defmodule Sift.Events do
-  alias Sift.Base
-  alias Sift.Base.Field
+  alias Sift.Schema
+  alias Sift.Schema.Field
+
+  alias Sift.Events.Types.{
+    Address,
+    App,
+    Booking,
+    Browser,
+    CountryCode,
+    CreditPoint,
+    CurrencyCode,
+    Discount,
+    Guest,
+    Image,
+    Item,
+    OrderedFrom,
+    PaymentMethod,
+    Promotion,
+    Segment
+  }
+
+  @types [
+    Address,
+    App,
+    Booking,
+    Browser,
+    CountryCode,
+    CreditPoint,
+    CurrencyCode,
+    Discount,
+    Guest,
+    Image,
+    Item,
+    OrderedFrom,
+    PaymentMethod,
+    Promotion,
+    Segment
+  ]
+
+  @type_map Map.new(@types, & {&1.type_alias(), &1})
 
   @add_item_to_cart_fields %{
     user_id: %Field{key: "$user_id", union: {:id, 0}, union_required?: true},
@@ -254,46 +292,55 @@ defmodule Sift.Events do
   }
 
   def add_item_to_cart(params) do
-    Base.execute("$add_item_to_cart", params, @add_item_to_cart_fields)
+    execute("$add_item_to_cart", params, @add_item_to_cart_fields)
   end
 
   def add_promotion(params) do
-    Base.execute("$add_promotion", params, @add_promotion_fields)
+    execute("$add_promotion", params, @add_promotion_fields)
   end
 
   def chargeback(params) do
-    Base.execute("$chargeback", params, @chargeback_fields)
+    execute("$chargeback", params, @chargeback_fields)
   end
 
   def content_status(params) do
-    Base.execute("$content_status", params, @content_status_fields)
+    execute("$content_status", params, @content_status_fields)
   end
 
   def create_account(params) do
-    Base.execute("$create_account", params, @create_account_fields)
+    execute("$create_account", params, @create_account_fields)
   end
 
   def create_content(params) do
-    Base.execute("$create_content", params, @create_content_fields)
+    execute("$create_content", params, @create_content_fields)
   end
 
   def create_order(params) do
-    Base.execute("$create_order", params, @create_order_fields)
+    execute("$create_order", params, @create_order_fields)
   end
 
   def flag_content(params) do
-    Base.execute("$flag_content", params, @flag_content_fields)
+    execute("$flag_content", params, @flag_content_fields)
   end
 
   def link_session_to_user(params) do
-    Base.execute("$link_session_to_user", params, @link_session_to_user_fields)
+    execute("$link_session_to_user", params, @link_session_to_user_fields)
   end
 
   def login(params) do
-    Base.execute("$login", params, @login_fields)
+    execute("$login", params, @login_fields)
   end
 
   def logout(params) do
-    Base.execute("$logout", params, @logout_fields)
+    execute("$logout", params, @logout_fields)
+  end
+
+  defp execute(event_name, params, specs) do
+    with {:ok, parsed} <- Schema.parse_with_types(params, specs, @type_map),
+         payload <- Map.put(parsed, "$type", event_name) do
+      {:ok, payload}
+    else
+      error -> error
+    end
   end
 end

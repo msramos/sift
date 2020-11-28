@@ -1,6 +1,6 @@
-defmodule Sift.Base.Types.PaymentMethod do
-  alias Sift.Base.{Field, Schema}
-  alias Sift.Base.Types.Type
+defmodule Sift.Events.Types.PaymentMethod do
+  alias Sift.Schema
+  alias Sift.Schema.{Field, Type}
 
   @behaviour Type
 
@@ -51,9 +51,9 @@ defmodule Sift.Base.Types.PaymentMethod do
   def type_alias, do: :payment_method
 
   @impl Type
-  def parse(%{} = value, _metadata) do
-    Schema.apply(value, @fields)
+  def parse(type_map, %{} = value, _metadata) do
+    Schema.parse(value, @fields, type_map)
   end
 
-  def parse(_value, _metadata), do: {:error, "not a map"}
+  def parse(_type_map, _value, _metadata), do: {:error, "not a map"}
 end

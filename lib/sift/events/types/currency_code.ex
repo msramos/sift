@@ -1,9 +1,5 @@
-defmodule Sift.Base.Types.CurrencyCode do
-  @moduledoc """
-  Country code type
-  """
-
-  alias Sift.Base.Types.Type
+defmodule Sift.Events.Types.CurrencyCode do
+  alias Sift.Schema.Type
 
   @behaviour Type
 
@@ -18,9 +14,9 @@ defmodule Sift.Base.Types.CurrencyCode do
   def type_alias, do: :currency_code
 
   @impl Type
-  def parse(<<_::utf8, _::utf8, _::utf8>> = code, _metadata) when code in @currency_codes do
+  def parse(_type_map, <<_::utf8, _::utf8, _::utf8>> = code, _metadata) when code in @currency_codes do
     {:ok, code}
   end
 
-  def parse(code, _metadata), do: {:error, "invalid currency code #{inspect(code)}"}
+  def parse(_type_map, code, _metadata), do: {:error, "invalid currency code #{inspect(code)}"}
 end

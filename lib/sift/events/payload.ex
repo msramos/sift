@@ -1,4 +1,4 @@
-defmodule Sift.Base.Payload do
+defmodule Sift.Events.Payload do
   alias Sift.Base.Schema
 
   def parse(params, event_name, schema) do

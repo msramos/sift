@@ -1,5 +1,5 @@
-defmodule Sift.Base.Types.CountryCode do
-  alias Sift.Base.Types.Type
+defmodule Sift.Events.Types.CountryCode do
+  alias Sift.Schema.Type
 
   @behaviour Type
 
@@ -13,9 +13,9 @@ defmodule Sift.Base.Types.CountryCode do
   def type_alias, do: :country_code
 
   @impl Type
-  def parse(<<_::utf8, _::utf8>> = code, _metadata) when code in @country_codes do
+  def parse(_type_map, <<_::utf8, _::utf8>> = code, _metadata) when code in @country_codes do
     {:ok, code}
   end
 
-  def parse(code, _metadata), do: {:error, "invalid country code #{inspect(code)}"}
+  def parse(_type_map, code, _metadata), do: {:error, "invalid country code #{inspect(code)}"}
 end
