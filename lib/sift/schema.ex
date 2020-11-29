@@ -8,11 +8,12 @@ defmodule Sift.Schema do
     List,
     String
   }
+
   alias Sift.Schema.Types.Enum, as: EnumType
 
   @types [Boolean, EnumType, Float, Integer, List, String]
 
-  @type_map Map.new(@types, & {&1.type_alias(), &1})
+  @type_map Map.new(@types, &{&1.type_alias(), &1})
 
   @spec parse(any, any, nil | maybe_improper_list | map) :: {:error, any} | {:ok, any}
   def parse_with_types(params, schema, extra_types) do

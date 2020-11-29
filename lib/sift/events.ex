@@ -38,7 +38,7 @@ defmodule Sift.Events do
     Segment
   ]
 
-  @type_map Map.new(@types, & {&1.type_alias(), &1})
+  @type_map Map.new(@types, &{&1.type_alias(), &1})
 
   @add_item_to_cart_fields %{
     user_id: %Field{key: "$user_id", union: {:id, 0}, union_required?: true},
@@ -291,6 +291,111 @@ defmodule Sift.Events do
     time: %Field{key: "$time", type: :integer}
   }
 
+  @order_status_fields %{
+    user_id: %Field{key: "$user_id", union: {:id, 0}, union_required?: true},
+    session_id: %Field{key: "$session_id", union: {:id, 1}},
+    order_id: %Field{key: "$order_id", required?: true},
+    order_status: %Field{
+      key: "$order_status",
+      required?: true,
+      type: {:enum, [:approved, :canceled, :held, :fulfilled, :returned]}
+    },
+    reason: %Field{key: "$reason", type: {:enum, [:payment_risk, :abuse, :policy, :other]}},
+    source: %Field{key: "$source", type: {:enum, [:automated, :manual_review]}},
+    analyst: %Field{key: "$analyst"},
+    webhook_id: %Field{key: "$webhook_id"},
+    description: %Field{key: "$description"},
+    browser: %Field{key: "$browser", type: :browser, union: :source},
+    app: %Field{key: "$app", type: :app, union: :source},
+    brand_name: %Field{key: "$brand_name"},
+    site_country: %Field{key: "$site_country", type: :country_code},
+    site_domain: %Field{key: "$site_domain"},
+    ip: %Field{key: "$ip"},
+    time: %Field{key: "$time", type: :integer}
+  }
+
+  @remove_item_from_cart_fields %{
+    user_id: %Field{key: "$user_id", union: {:id, 0}, union_required?: true},
+    session_id: %Field{key: "$session_id", union: {:id, 1}},
+    item: %Field{key: "$item", type: :item},
+    browser: %Field{key: "$browser", type: :browser, union: :source},
+    app: %Field{key: "$app", type: :app, union: :source},
+    brand_name: %Field{key: "$brand_name"},
+    site_country: %Field{key: "$site_country", type: :country_code},
+    site_domain: %Field{key: "$site_domain"},
+    ip: %Field{key: "$ip"},
+    time: %Field{key: "$time", type: :integer}
+  }
+
+  @security_notification_fields %{
+    user_id: %Field{key: "$user_id", union: {:id, 0}, union_required?: true},
+    session_id: %Field{key: "$session_id", union: {:id, 1}},
+    notification_type: %Field{key: "$notification_type", type: {:enum, [:email, :sms, :push]}},
+    notified_value: %Field{key: "$notified_value"},
+    notification_status: %Field{
+      key: "$notification_status",
+      required?: true,
+      type: {:enum, [:sent, :safe, :compromised]}
+    },
+    browser: %Field{key: "$browser", type: :browser, union: :source},
+    app: %Field{key: "$app", type: :app, union: :source},
+    brand_name: %Field{key: "$brand_name"},
+    site_country: %Field{key: "$site_country", type: :country_code},
+    site_domain: %Field{key: "$site_domain"},
+    ip: %Field{key: "$ip"},
+    time: %Field{key: "$time", type: :integer}
+  }
+
+  @transaction_fields %{
+    user_id: %Field{key: "$user_id", union: {:id, 0}, union_required?: true},
+    session_id: %Field{key: "$session_id", union: {:id, 1}},
+    user_email: %Field{key: "$user_email"},
+    transaction_type: %Field{
+      key: "$transaction_type",
+      required?: true,
+      type:
+        {:enum, [:sale, :authorize, :capture, :void, :refund, :deposit, :withdrawal, :transfer]}
+    },
+    transaction_status: %Field{
+      key: "$transaction_status",
+      type: {:enum, [:success, :failure, :pending]}
+    },
+    amount: %Field{key: "$amount", required?: true, type: :integer},
+    currency_code: %Field{key: "$currency_code", required?: true, type: :currency_code},
+    order_id: %Field{key: "$order_id"},
+    transaction_id: %Field{key: "$transaction_id"},
+    billing_address: %Field{key: "$billing_address", type: :address},
+    payment_method: %Field{key: "$payment_method", type: :payment_method},
+    shipping_address: %Field{key: "$shipping_address", type: :address},
+    transfer_recipient_user_id: %Field{key: "$transfer_recipient_user_id"},
+    decline_category: %Field{
+      key: "$decline_category",
+      type:
+        {:enum,
+         [
+           :fraud,
+           :lost_or_stolen,
+           :risky,
+           :bank_decline,
+           :invalid,
+           :expired,
+           :insufficient_funds,
+           :limit_exceeded,
+           :additional_verification_required,
+           :invalid_verification,
+           :other
+         ]}
+    },
+    ordered_from: %Field{key: "$ordered_from", type: :ordered_from},
+    browser: %Field{key: "$browser", type: :browser, union: :source},
+    app: %Field{key: "$app", type: :app, union: :source},
+    brand_name: %Field{key: "$brand_name"},
+    site_country: %Field{key: "$site_country", type: :country_code},
+    site_domain: %Field{key: "$site_domain"},
+    ip: %Field{key: "$ip"},
+    time: %Field{key: "$time", type: :integer}
+  }
+
   def add_item_to_cart(params) do
     execute("$add_item_to_cart", params, @add_item_to_cart_fields)
   end
@@ -333,6 +438,22 @@ defmodule Sift.Events do
 
   def logout(params) do
     execute("$logout", params, @logout_fields)
+  end
+
+  def order_status(params) do
+    execute("$order_status", params, @order_status_fields)
+  end
+
+  def remove_item_from_cart(params) do
+    execute("$remove_item_from_cart", params, @remove_item_from_cart_fields)
+  end
+
+  def security_notification(params) do
+    execute("$security_notification", params, @security_notification_fields)
+  end
+
+  def transaction(params) do
+    execute("$transaction", params, @transaction_fields)
   end
 
   defp execute(event_name, params, specs) do

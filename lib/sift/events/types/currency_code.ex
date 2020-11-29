@@ -14,7 +14,8 @@ defmodule Sift.Events.Types.CurrencyCode do
   def type_alias, do: :currency_code
 
   @impl Type
-  def parse(_type_map, <<_::utf8, _::utf8, _::utf8>> = code, _metadata) when code in @currency_codes do
+  def parse(_type_map, <<_::utf8, _::utf8, _::utf8>> = code, _metadata)
+      when code in @currency_codes do
     {:ok, code}
   end
 
