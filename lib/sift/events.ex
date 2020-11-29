@@ -396,6 +396,108 @@ defmodule Sift.Events do
     time: %Field{key: "$time", type: :integer}
   }
 
+  @update_account_fields %{
+    user_id: %Field{key: "$user_id", union: {:id, 0}, union_required?: true},
+    session_id: %Field{key: "$session_id", union: {:id, 1}},
+    changed_password: %Field{key: "$changed_password", type: :boolean},
+    user_email: %Field{key: "$user_email"},
+    name: %Field{key: "$name"},
+    phone: %Field{key: "$phone"},
+    referrer_user_id: %Field{key: "$referrer_user_id"},
+    payment_methods: %Field{key: "$payment_methods", type: {:list, :payment_method}},
+    billing_address: %Field{key: "$billing_address", type: :address},
+    shipping_address: %Field{key: "$shipping_address", type: :address},
+    social_sign_on_type: %Field{
+      key: "$social_sign_on_type",
+      type:
+        {:enum,
+         [:facebook, :google, :linkedin, :twitter, :yahoo, :microsoft, :amazon, :apple, :other]}
+    },
+    browser: %Field{key: "$browser", type: :browser, union: :source},
+    app: %Field{key: "$app", type: :app, union: :source},
+    account_types: %Field{key: "$account_types", type: {:list, :string}},
+    brand_name: %Field{key: "$brand_name"},
+    site_country: %Field{key: "$site_country", type: :country_code},
+    site_domain: %Field{key: "$site_domain"},
+    ip: %Field{key: "$ip"},
+    time: %Field{key: "$time", type: :integer}
+  }
+
+  @update_content_fields @create_content_fields
+
+  @update_order_fields @create_order_fields
+
+  @update_password_fields %{
+    user_id: %Field{key: "$user_id", union: {:id, 0}, union_required?: true},
+    session_id: %Field{key: "$session_id", union: {:id, 1}},
+    reason: %Field{
+      key: "$reason",
+      required?: true,
+      type: {:enum, [:user_update, :forgot_password, :forced_reset]}
+    },
+    status: %Field{key: "$status", required?: true, type: {:enum, [:pending, :success, :failure]}},
+    browser: %Field{key: "$browser", type: :browser, union: :source},
+    app: %Field{key: "$app", type: :app, union: :source},
+    brand_name: %Field{key: "$brand_name"},
+    site_country: %Field{key: "$site_country", type: :country_code},
+    site_domain: %Field{key: "$site_domain"},
+    ip: %Field{key: "$ip"},
+    time: %Field{key: "$time", type: :integer}
+  }
+
+  @verification_fields %{
+    user_id: %Field{key: "$user_id", required?: true},
+    session_id: %Field{key: "$session_id", required?: true},
+    status: %Field{key: "$status", required?: true, type: {:enum, [:pending, :success, :failure]}},
+    verified_event: %Field{
+      key: "$verified_event",
+      type:
+        {:enum,
+         [
+           :login,
+           :create_account,
+           :update_account,
+           :update_password,
+           :create_content,
+           :create_order,
+           :transaction,
+           :update_content,
+           :update_order
+         ]}
+    },
+    verified_entity_id: %Field{key: "$verified_entity_id"},
+    verification_type: %Field{
+      key: "$verification_type",
+      type:
+        {:enum,
+         [
+           :sms,
+           :phone_call,
+           :email,
+           :app_tfa,
+           :captcha,
+           :shared_knowledge,
+           :face,
+           :fingerprint,
+           :push,
+           :security_key
+         ]}
+    },
+    verified_value: %Field{key: "$verified_value"},
+    reason: %Field{
+      key: "$reason",
+      required?: true,
+      type: {:enum, [:user_setting, :manual_review, :automated_rule]}
+    },
+    browser: %Field{key: "$browser", type: :browser, union: :source},
+    app: %Field{key: "$app", type: :app, union: :source},
+    brand_name: %Field{key: "$brand_name"},
+    site_country: %Field{key: "$site_country", type: :country_code},
+    site_domain: %Field{key: "$site_domain"},
+    ip: %Field{key: "$ip"},
+    time: %Field{key: "$time", type: :integer}
+  }
+
   def add_item_to_cart(params) do
     execute("$add_item_to_cart", params, @add_item_to_cart_fields)
   end
@@ -454,6 +556,26 @@ defmodule Sift.Events do
 
   def transaction(params) do
     execute("$transaction", params, @transaction_fields)
+  end
+
+  def update_account(params) do
+    execute("$update_account", params, @update_account_fields)
+  end
+
+  def update_content(params) do
+    execute("$update_content", params, @update_content_fields)
+  end
+
+  def update_order(params) do
+    execute("$update_order", params, @update_order_fields)
+  end
+
+  def update_password(params) do
+    execute("$update_password", params, @update_password_fields)
+  end
+
+  def verification(params) do
+    execute("$verification", params, @verification_fields)
   end
 
   defp execute(event_name, params, specs) do
