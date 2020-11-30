@@ -1,3 +1,3 @@
 defmodule Sift do
-  @moduledoc false
+  def events(), do: Sift.Events
 end
