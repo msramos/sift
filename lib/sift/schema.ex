@@ -1,17 +1,13 @@
 defmodule Sift.Schema do
   alias Sift.Schema.Field
+  alias Sift.Schema.Types.Boolean, as: BooleanType
+  alias Sift.Schema.Types.Enum, as: EnumType
+  alias Sift.Schema.Types.Float, as: FloatType
+  alias Sift.Schema.Types.Integer, as: IntegerType
+  alias Sift.Schema.Types.List, as: ListType
+  alias Sift.Schema.Types.String, as: StringType
 
-  alias Sift.Schema.Types.{
-    Boolean,
-    Float,
-    Integer,
-    List,
-    String
-  }
-
-  alias Sift.Schema.Types.Enum, as: EnumT
-
-  @basic_types_list [Boolean, EnumT, Float, Integer, List, String]
+  @basic_types_list [BooleanType, EnumType, FloatType, IntegerType, ListType, StringType]
 
   @basic_types Map.new(@basic_types_list, &{&1.type_alias(), &1})
 
