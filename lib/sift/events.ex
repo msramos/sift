@@ -1,4 +1,5 @@
 defmodule Sift.Events do
+  alias Sift.HTTP.Request
   alias Sift.Schema
   alias Sift.Schema.Field
 
@@ -556,7 +557,7 @@ defmodule Sift.Events do
   defp execute(event_name, params, specs) do
     with {:ok, parsed} <- Schema.parse(params, specs),
          payload <- Map.put(parsed, "$type", event_name) do
-      {:ok, payload}
+      {:ok, %Request{method: :post, url: "https://api.sift.com/v205/events", body: payload}}
     else
       error -> error
     end
