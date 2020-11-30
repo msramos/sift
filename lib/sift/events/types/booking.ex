@@ -1,4 +1,5 @@
 defmodule Sift.Events.Types.Booking do
+  alias Sift.Events.Types.{Address, CurrencyCode, Guest, Segment}
   alias Sift.Schema
   alias Sift.Schema.{Field, Type}
 
@@ -24,22 +25,22 @@ defmodule Sift.Events.Types.Booking do
     start_time: %Field{key: "$start_time", type: :integer},
     end_time: %Field{key: "$start_time", type: :integer},
     price: %Field{key: "$price"},
-    currency_code: %Field{key: "$currency_code", type: :currency_code},
+    currency_code: %Field{key: "$currency_code", type: CurrencyCode},
     quantity: %Field{key: "$quantity", type: :integer},
-    guests: %Field{key: "$guests", type: {:list, :guest}},
-    segments: %Field{key: "$segments", type: {:list, :segment}},
+    guests: %Field{key: "$guests", type: {:list, Guest}},
+    segments: %Field{key: "$segments", type: {:list, Segment}},
     tags: %Field{key: "$tags", type: {:list, :string}},
     room_type: %Field{key: "$room_type"},
     event_id: %Field{key: "$event_id"},
     venue_id: %Field{key: "$venue_id"},
-    location: %Field{key: "$location", type: :address},
+    location: %Field{key: "$location", type: Address},
     category: %Field{key: "$category"}
   }
 
   @impl Type
-  def parse(type_map, %{} = value, _metadata) do
-    Schema.parse(value, @fields, type_map)
+  def parse(%{} = value, _metadata) do
+    Schema.parse(value, @fields)
   end
 
-  def parse(_type_map, _value, _metadata), do: {:error, "not a map"}
+  def parse(_value, _metadata), do: {:error, "not a map"}
 end

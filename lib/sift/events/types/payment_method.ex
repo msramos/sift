@@ -51,9 +51,9 @@ defmodule Sift.Events.Types.PaymentMethod do
   def type_alias, do: :payment_method
 
   @impl Type
-  def parse(type_map, %{} = value, _metadata) do
-    Schema.parse(value, @fields, type_map)
+  def parse(%{} = value, _metadata) do
+    Schema.parse(value, @fields)
   end
 
-  def parse(_type_map, _value, _metadata), do: {:error, "not a map"}
+  def parse(_value, _metadata), do: {:error, "not a map"}
 end

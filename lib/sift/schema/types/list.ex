@@ -8,12 +8,12 @@ defmodule Sift.Schema.Types.List do
   def type_alias, do: :list
 
   @impl Type
-  def parse(_type_map, values, item_type)
+  def parse(values, item_type)
 
-  def parse(type_map, values, item_type) when is_list(values) do
+  def parse(values, item_type) when is_list(values) do
     result =
       Enum.reduce_while(values, [], fn v, acc ->
-        case Schema.parse_value(v, item_type, type_map) do
+        case Schema.parse_value(v, item_type) do
           {:ok, value} ->
             {:cont, [value | acc]}
 
@@ -28,5 +28,5 @@ defmodule Sift.Schema.Types.List do
     end
   end
 
-  def parse(_type_map, _value, _opts), do: {:error, "not a list"}
+  def parse(_value, _opts), do: {:error, "not a list"}
 end

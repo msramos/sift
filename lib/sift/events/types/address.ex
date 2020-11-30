@@ -1,4 +1,5 @@
 defmodule Sift.Events.Types.Address do
+  alias Sift.Events.Types.CountryCode
   alias Sift.Schema
   alias Sift.Schema.{Field, Type}
 
@@ -13,15 +14,15 @@ defmodule Sift.Events.Types.Address do
     address_2: %Field{key: "$address_2"},
     city: %Field{key: "$city"},
     region: %Field{key: "$region"},
-    country: %Field{key: "$country", type: :country_code},
+    country: %Field{key: "$country", type: CountryCode},
     zipcode: %Field{key: "$zipcode"},
     phone: %Field{key: "$phone"}
   }
 
   @impl Type
-  def parse(type_map, %{} = value, _metadata) do
-    Schema.parse(value, @fields, type_map)
+  def parse(%{} = value, _metadata) do
+    Schema.parse(value, @fields)
   end
 
-  def parse(_type_map, _value, _metadata), do: {:error, "not a map"}
+  def parse(_value, _metadata), do: {:error, "not a map"}
 end

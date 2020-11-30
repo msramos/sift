@@ -14,10 +14,10 @@ defmodule Sift.Events.Types.CurrencyCode do
   def type_alias, do: :currency_code
 
   @impl Type
-  def parse(_type_map, <<_::utf8, _::utf8, _::utf8>> = code, _metadata)
+  def parse(<<_::utf8, _::utf8, _::utf8>> = code, _metadata)
       when code in @currency_codes do
     {:ok, code}
   end
 
-  def parse(_type_map, code, _metadata), do: {:error, "invalid currency code #{inspect(code)}"}
+  def parse(code, _metadata), do: {:error, "invalid currency code #{inspect(code)}"}
 end

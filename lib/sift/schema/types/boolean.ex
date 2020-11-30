@@ -7,6 +7,6 @@ defmodule Sift.Schema.Types.Boolean do
   def type_alias, do: :boolean
 
   @impl Type
-  def parse(_type_map, value, _metadata) when is_boolean(value), do: {:ok, value}
-  def parse(_type_map, _value, _metadata), do: {:error, "invalid boolean"}
+  def parse(value, _metadata) when is_boolean(value), do: {:ok, value}
+  def parse(_value, _metadata), do: {:error, "invalid boolean"}
 end

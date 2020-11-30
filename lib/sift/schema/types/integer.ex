@@ -7,7 +7,7 @@ defmodule Sift.Schema.Types.Integer do
   def type_alias, do: :integer
 
   @impl Type
-  def parse(_type_map, value, _metadata)
-  def parse(_type_map, value, _metadata) when is_integer(value), do: {:ok, value}
-  def parse(_type_map, _value, _metadata), do: {:error, "invalid integer"}
+  def parse(value, _metadata)
+  def parse(value, _metadata) when is_integer(value), do: {:ok, value}
+  def parse(_value, _metadata), do: {:error, "invalid integer"}
 end

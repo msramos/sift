@@ -9,26 +9,21 @@ defmodule Sift.Schema do
     String
   }
 
-  alias Sift.Schema.Types.Enum, as: EnumType
+  alias Sift.Schema.Types.Enum, as: EnumT
 
-  @types [Boolean, EnumType, Float, Integer, List, String]
+  @basic_types_list [Boolean, EnumT, Float, Integer, List, String]
 
-  @type_map Map.new(@types, &{&1.type_alias(), &1})
+  @basic_types Map.new(@basic_types_list, &{&1.type_alias(), &1})
 
-  @spec parse(any, any, nil | maybe_improper_list | map) :: {:error, any} | {:ok, any}
-  def parse_with_types(params, schema, extra_types) do
-    types = Map.merge(@type_map, extra_types)
+  @basic_types_aliases Enum.map(@basic_types_list, & &1.type_alias())
 
-    parse(params, schema, types)
-  end
-
-  def parse(params, schema, types) do
+  def parse(input, field_specs) do
     parsed_result =
-      Enum.reduce(schema, {%{}, []}, fn {key, spec}, {value_acc, error_acc} = acc ->
+      Enum.reduce(field_specs, {%{}, []}, fn {key, spec}, {value_acc, error_acc} = acc ->
         result =
-          params
+          input
           |> Map.get(key)
-          |> parse_entry(spec, types)
+          |> parse_entry(spec)
 
         case result do
           {:ok, nil} ->
@@ -53,17 +48,17 @@ defmodule Sift.Schema do
     end
   end
 
-  def parse_value(value, type, type_map) do
-    {type_module, metadata} = get_type(type_map, type)
-    apply(type_module, :parse, [type_map, value, metadata])
+  def parse_value(input, type) do
+    {type_module, metadata} = type_module_and_metadata(type)
+    apply(type_module, :parse, [input, metadata])
   end
 
-  defp parse_entry(nil, %Field{required?: false}, _types), do: {:ok, nil}
+  defp parse_entry(nil, %Field{required?: false}), do: {:ok, nil}
 
-  defp parse_entry(nil, %Field{required?: true}, _types), do: {:error, "missing required field"}
+  defp parse_entry(nil, %Field{required?: true}), do: {:error, "missing required field"}
 
-  defp parse_entry(value, %Field{type: %{} = custom_type} = spec, types) do
-    case parse(value, custom_type, types) do
+  defp parse_entry(input, %Field{type: %{} = custom_complex_type} = spec) do
+    case parse(input, custom_complex_type) do
       {:ok, parsed_value} ->
         {:ok, {spec.key, parsed_value}}
 
@@ -72,10 +67,10 @@ defmodule Sift.Schema do
     end
   end
 
-  defp parse_entry(value, %Field{} = spec, types) do
-    {type_module, metadata} = get_type(types, spec.type)
+  defp parse_entry(input, %Field{} = spec) do
+    {type_module, metadata} = type_module_and_metadata(spec.type)
 
-    case apply(type_module, :parse, [types, value, metadata]) do
+    case apply(type_module, :parse, [input, metadata]) do
       {:ok, parsed_value} ->
         {:ok, {spec.key, parsed_value}}
 
@@ -84,13 +79,19 @@ defmodule Sift.Schema do
     end
   end
 
-  defp get_type(types, type) do
-    case type do
-      {type_alias, meta} ->
-        {Map.fetch!(types, type_alias), meta}
+  defp type_module_and_metadata({type_alias, metadata}) when type_alias in @basic_types_aliases do
+    {Map.fetch!(@basic_types, type_alias), metadata}
+  end
 
-      type_alias ->
-        {Map.fetch!(types, type_alias), nil}
-    end
+  defp type_module_and_metadata(type_alias) when type_alias in @basic_types_aliases do
+    {Map.fetch!(@basic_types, type_alias), nil}
+  end
+
+  defp type_module_and_metadata({type_module, metadata}) when is_atom(type_module) do
+    {type_module, metadata}
+  end
+
+  defp type_module_and_metadata(type_module) when is_atom(type_module) do
+    {type_module, nil}
   end
 end

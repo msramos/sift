@@ -1,4 +1,5 @@
 defmodule Sift.Events.Types.Promotion do
+  alias Sift.Events.Types.{CreditPoint, Discount}
   alias Sift.Schema
   alias Sift.Schema.{Field, Type}
 
@@ -16,14 +17,14 @@ defmodule Sift.Events.Types.Promotion do
     },
     description: %Field{key: "$description"},
     referrer_user_id: %Field{key: "$referrer_user_id"},
-    discount: %Field{key: "$discount", type: :discount},
-    credit_point: %Field{key: "$credit_point", type: :credit_point}
+    discount: %Field{key: "$discount", type: Discount},
+    credit_point: %Field{key: "$credit_point", type: CreditPoint}
   }
 
   @impl Type
-  def parse(type_map, %{} = value, _metadata) do
-    Schema.parse(value, @fields, type_map)
+  def parse(%{} = value, _metadata) do
+    Schema.parse(value, @fields)
   end
 
-  def parse(_type_map, _value, _metadata), do: {:error, "not a map"}
+  def parse(_value, _metadata), do: {:error, "not a map"}
 end

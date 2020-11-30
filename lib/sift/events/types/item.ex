@@ -1,4 +1,5 @@
 defmodule Sift.Events.Types.Item do
+  alias Sift.Events.Types.CurrencyCode
   alias Sift.Schema
   alias Sift.Schema.{Field, Type}
 
@@ -11,7 +12,7 @@ defmodule Sift.Events.Types.Item do
     item_id: %Field{key: "$item_id"},
     product_title: %Field{key: "$product_title"},
     price: %Field{key: "$price", type: :integer},
-    currency_code: %Field{key: "$currency_code", type: :currency_code},
+    currency_code: %Field{key: "$currency_code", type: CurrencyCode},
     quantity: %Field{key: "$quantity", type: :integer},
     upc: %Field{key: "$upc"},
     sku: %Field{key: "$sku"},
@@ -25,9 +26,9 @@ defmodule Sift.Events.Types.Item do
   }
 
   @impl Type
-  def parse(type_map, %{} = value, _metadata) do
-    Schema.parse(value, @fields, type_map)
+  def parse(%{} = value, _metadata) do
+    Schema.parse(value, @fields)
   end
 
-  def parse(_type_map, _value, _metadata), do: {:error, "not a map"}
+  def parse(_value, _metadata), do: {:error, "not a map"}
 end

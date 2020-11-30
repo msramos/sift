@@ -13,9 +13,9 @@ defmodule Sift.Events.Types.CountryCode do
   def type_alias, do: :country_code
 
   @impl Type
-  def parse(_type_map, <<_::utf8, _::utf8>> = code, _metadata) when code in @country_codes do
+  def parse(<<_::utf8, _::utf8>> = code, _metadata) when code in @country_codes do
     {:ok, code}
   end
 
-  def parse(_type_map, code, _metadata), do: {:error, "invalid country code #{inspect(code)}"}
+  def parse(code, _metadata), do: {:error, "invalid country code #{inspect(code)}"}
 end

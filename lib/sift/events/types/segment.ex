@@ -1,4 +1,5 @@
 defmodule Sift.Events.Types.Segment do
+  alias Sift.Events.Types.Address
   alias Sift.Schema
   alias Sift.Schema.{Field, Type}
 
@@ -13,8 +14,8 @@ defmodule Sift.Events.Types.Segment do
               |> String.split("\n")
 
   @fields %{
-    departure_address: %Field{key: "$departure_address", type: :address},
-    arrival_address: %Field{key: "$arrival_address", type: :address},
+    departure_address: %Field{key: "$departure_address", type: Address},
+    arrival_address: %Field{key: "$arrival_address", type: Address},
     start_time: %Field{key: "$start_time", type: :integer},
     end_time: %Field{key: "$end_time", type: :integer},
     vessel_number: %Field{key: "$vessel_number"},
@@ -27,9 +28,9 @@ defmodule Sift.Events.Types.Segment do
   def type_alias, do: :segment
 
   @impl Type
-  def parse(type_map, %{} = value, _metadata) do
-    Schema.parse(value, @fields, type_map)
+  def parse(%{} = value, _metadata) do
+    Schema.parse(value, @fields)
   end
 
-  def parse(_type_map, _value, _metadata), do: {:error, "not a map"}
+  def parse(_value, _metadata), do: {:error, "not a map"}
 end
