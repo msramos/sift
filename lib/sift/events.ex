@@ -526,7 +526,7 @@ defmodule Sift.Events do
            :sms,
            :phone_call,
            :email,
-           App_tfa,
+           :app_tfa,
            :captcha,
            :shared_knowledge,
            :face,
