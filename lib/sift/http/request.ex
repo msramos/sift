@@ -1,9 +1,10 @@
 defmodule Sift.HTTP.Request do
-  defstruct [:url, :body, :headers, :method]
+  @enforce_keys [:url]
+  defstruct url: nil, body: nil, headers: [], method: :get
 
   @type t :: %{
           url: String.t(),
-          body: map(),
+          body: map() | nil,
           headers: [tuple],
           method: :post | :get
         }
